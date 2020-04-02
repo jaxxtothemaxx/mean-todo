@@ -1,5 +1,8 @@
 // Set Up ==============================
 
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://alex:@mean-todo-bpbyr.mongodb.net/test?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true });
 var express = require('express');
 var app = express();                               // create our app with express
 var mongoose = require('mongoose');                // mongoose for mondodb
@@ -9,8 +12,12 @@ var methodOverride = require('method-override');   // simulate DELETE and PUT (e
 
 // Configuration =======================
 
-mongoose.connect('mongodb+srv://alex:<db-password>@mean-todo-bpbyr.mongodb.net/test?retryWrites=true&w=majority'
-); // connect to mongoDB database on modulus.io
+MongoClient.connect('mongodb+srv://alex:@mean-todo-bpbyr.mongodb.net/test?retryWrites=true&w=majority'); // connect to mongoDB database on modulus.io
+client.connect(err => {
+  const collection = client.db("test").collection("devices");
+  // perform actions on the collection object
+  client.close();
+});
 
 app.use(express.static(__dirname + '/public'));                   // set the static files location /public/img will be for users
 app.use(morgan('dev'));                                           // log ever request to the console
@@ -71,6 +78,10 @@ app.delete('/api/todos/:todo.id', function(req, res){
         });
       });
 });
+
+app.get('*', function(req, res) {
+       res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+   });
 
 // listen (start app with node server.js) =======================
 app.listen(8080);
